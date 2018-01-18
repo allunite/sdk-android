@@ -57,8 +57,8 @@ Android SDK - Quick Start Guide
     apply plugin: 'com.android.application'
 
     dependencies {
-        compile 'com.github.allunite:mobile-unity-sdk:1.2.16'
-        compile('com.bluecats:bluecats-android-sdk:2.0.4', {
+        compile 'com.github.allunite:mobile-unity-sdk:1.2.18'
+        compile('com.bluecats:bluecats-android-sdk:2.0.7', {
         	exclude group: 'com.google.code.gson', module: 'gson'
 	        exclude group: 'com.android.support', module: 'support-compat'
         	exclude group: 'com.android.support', module: 'support-core-utils'
