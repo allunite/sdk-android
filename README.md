@@ -258,7 +258,29 @@ public class MainActivity extends AppCompatActivity implements IDidFindBeaconLis
 }
 ```
 
+#### 10. Permission flow
 
-#### 10. That's it! AllUnite is now integrated with your app.
+Track when user gives to you location permission using AllUniteSdk.sendLocationPermissionsGranted(Context) at Runtime Permissions callback.
+
+Example:
+```
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_LOCATION_PERMISSION
+                && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            AllUniteSdk.sendLocationPermissionsGranted(this);
+        }
+    }
+```
+
+#### 11. Track current device status.
+```
+AllUniteSdk.trackDeviceStatus(context);
+```
+
+#### 12. That's it! AllUnite is now integrated with your app.
 
 In order to ensure our library doesn't have an impact on user experience, we send events asynchronously.
