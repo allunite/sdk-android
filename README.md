@@ -281,6 +281,21 @@ Example:
 AllUniteSdk.trackDeviceStatus(context);
 ```
 
+If you want track device status by Google or Firebase Cloud Messages please put it into callback method:
+
+```
+public class MyGcmListenerService extends com.google.android.gms.gcm.GcmListenerService {
+
+    ...
+
+	@Override
+	public void onMessageReceived(String from, Bundle data) {
+	        // some code
+	        AllUniteSdk.trackDeviceStatus(getApplication());
+		}
+	}
+```
+
 #### 12. That's it! AllUnite is now integrated with your app.
 
 In order to ensure our library doesn't have an impact on user experience, we send events asynchronously.
