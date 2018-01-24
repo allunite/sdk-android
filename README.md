@@ -57,7 +57,7 @@ Android SDK - Quick Start Guide
     apply plugin: 'com.android.application'
 
     dependencies {
-        compile 'com.github.allunite:mobile-unity-sdk:1.2.18'
+        compile 'com.github.allunite:mobile-unity-sdk:1.2.19'
         compile('com.bluecats:bluecats-android-sdk:2.0.7', {
         	exclude group: 'com.google.code.gson', module: 'gson'
 	        exclude group: 'com.android.support', module: 'support-compat'
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements IDidFindBeaconLis
 
 #### 10. Permission flow
 
-Track when user gives to you location permission using AllUniteSdk.sendLocationPermissionsGranted(Context) at Runtime Permissions callback.
+Track when user accept location permission using AllUniteSdk.sendLocationPermissionsGranted(Context) at Runtime Permissions callback.
 
 Example:
 ```
@@ -281,7 +281,7 @@ Example:
 AllUniteSdk.trackDeviceStatus(context);
 ```
 
-If you want track device status by Google or Firebase Cloud Messages please put it into callback method:
+To track device status on receiving push notification by Google or Firebase Cloud Messages please put it into callback method:
 
 ```
 public class MyGcmListenerService extends com.google.android.gms.gcm.GcmListenerService {
