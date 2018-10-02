@@ -28,19 +28,13 @@ It can be useful if Application shows Terms & Conditions page that has "OK" and 
 In this case "No Thanks" button opens <app_schema>://allunite-sdk-mode?enable=false that disables AllUnite SDK functionality, 
 "OK" button can starts matching process directly in the browser (we need to customize it first) or using AllUniteSdk.bindDevice() method (see next paragraph).
 
-##### 2. Match phisycal device (**REQUIRED**)
-To match the device we need to open web browser and do a few redirects to link consumer's cookies with device ID.
-Finally consumer's journey ends on a landing page that tries to open Application at once or makes it possible to open Application later.
-
-Method AllUniteSdk.bindDevice() performs matching process described above.
-
-##### 3. Start beacon tracking (**REQUIRED**)
+##### 2. Start beacon tracking (**REQUIRED**)
 To start tracking you need to call AllUniteSdk.addDidFindBeaconListener() method.
 AllUnite SDK will track device in foreground and background until AllUniteSdk.removeDidFindBeaconListener() method is called.
 You can override didFindBeacon(String id, Integer major, Integer minor) that will be called each time when beacon detected (see "Beacons listening" below).
 It can be used to show a message or do any other actions when consumer enters an area of the beacon vicinity.
 
-##### 4. Custom actions tracking (**OPTIONAL**)
+##### 3. Custom actions tracking (**OPTIONAL**)
 You can register any custom actions using AllUniteSdk.track() method and use it next to location tracking info on the AllUnite Campaign Dashboard.
 
 Android SDK - Quick Start Guide
@@ -49,30 +43,36 @@ Android SDK - Quick Start Guide
 #### 1. Add dependencies to *build.gradle*
 ```
     allprojects {
-    repositories {
-        maven { url "https://jitpack.io" }
-    }
+        repositories {
+            maven { url "https://jitpack.io" }
+            google()
+        }
     }
     
     apply plugin: 'com.android.application'
 
     dependencies {
-        compile 'com.github.allunite:mobile-unity-sdk:1.2.19'
-        compile('com.bluecats:bluecats-android-sdk:2.0.7', {
-        	exclude group: 'com.google.code.gson', module: 'gson'
-	        exclude group: 'com.android.support', module: 'support-compat'
-        	exclude group: 'com.android.support', module: 'support-core-utils'
-    })
+        implementation 'com.github.allunite:mobile-unity-sdk:2.1.0@aar'
+
+        implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+        implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+        implementation 'com.squareup.okhttp3:logging-interceptor:3.3.1'
+        implementation 'org.altbeacon:android-beacon-library:2.15.1@aar'
+
+        def work_version = "1.0.0-alpha09"
+        implementation "android.arch.work:work-runtime:$work_version"
+        implementation "android.arch.work:work-firebase:$work_version"
+
     }
 
     android {
-        compileSdkVersion 22
-        buildToolsVersion "22.0.1"
+        compileSdkVersion 28
+        buildToolsVersion "28.0.2"
 
         defaultConfig {
             applicationId "com.allunite.example.myapplication"
             minSdkVersion 15
-            targetSdkVersion 22
+            targetSdkVersion 28
             versionCode 1
             versionName "1.0"
         }
@@ -80,7 +80,7 @@ Android SDK - Quick Start Guide
 ```
 If you want to use your own dependencies on Gson, Retrofit or OkHttp logging interceptor with another version, exclude the transitive dependencies like this:
 ```
-    compile('com.github.allunite:mobile-unity-sdk:1.1.2', {
+    implementation('com.github.allunite:mobile-unity-sdk:2.1.0', {
         exclude group: 'com.google.code.gson', module: 'gson'
         exclude group: 'com.squareup.retrofit2', module: 'retrofit'
         exclude group: 'com.squareup.retrofit2', module: 'converter-gson'
@@ -88,33 +88,28 @@ If you want to use your own dependencies on Gson, Retrofit or OkHttp logging int
     })
 ```
 
-#### 2. Add permissions to *src/main/AndroidManifest.xml*
+#### 2. Update *src/main/AndroidManifest.xml*
+Make sure you definied Application.
 ```
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.allunite.example.myapplication">
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.myapplication">
 
-	<uses-permission android:name="android.permission.BLUETOOTH" />
-	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-	<application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:theme="@style/AppTheme" >
-	<receiver android:name="com.allunite.sdk.startup.StartupBroadcastReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-                <action android:name="com.allunite.sdk.startup.start" />
-            </intent-filter>
-        </receiver>
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
 
-        <service
-            android:name="com.bluecats.sdk.BlueCatsSDKService"
-            android:enabled="true" />
-        <service android:name=".service.BCService" />
+    ...
+
+    </application>
+
 </manifest>
 ```
 And add two <meta-data> entries with your app credentials:
@@ -127,13 +122,27 @@ And add two <meta-data> entries with your app credentials:
             android:value="YOUR_ACCOUNT_KEY" />
 ```
  
+#### 3. Inherit your application from AllUniteSDKApp class:
+```
+    package com.example.myapplication;
 
-#### 3. Add AllUnite to your main activity *src/main/java/com/allunite/example/myapplication/MainActivity.java*
+    import com.allunite.sdk.AllUniteSdk;
+    import com.allunite.sdk.AllUniteSdkApp;
+
+    public class MyApplication extends AllUniteSdkApp {
+        @Override
+        public void onCreate() {
+            super.onCreate();
+        }
+    }
+```
+
+#### 4. Add AllUnite to your main activity *src/main/java/com/example/myapplication/MainActivity.java*
 
 On Android, the SDK's app activation helper should be invoked once when the application is created, so in your Application class's onCreate method, place the following:
 
 ```
-    package com.allunite.example.myapplication;
+    package com.example.myapplication;
 
     import android.os.Bundle;
     import android.support.v7.app.ActionBarActivity;
@@ -176,20 +185,6 @@ AllUniteSdk.init(MainActivity.this, new IActionListener() {
             });
 ```
 
-#### 4. Add code to bind device to customer's profile
-
-```
-	...
-
-	final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-	boolean isAgreed = sharedPreferences.getBoolean("agreed", false);
-	if (!isAgreed) {
-		ModalResult result = showEula();
-		if (result == ModalResult.Accepted)
-			AllUniteSdk.bindDevice();
-	}
-```
-<span style="color: rgb(76,85,90);">Now this device is bound to customer's online analytics data collected from web browser on the device.</span>
 
 #### 5. Add code for intercepting users choise at web Terms&Conditions using deeplink
 At first you need to know your Uri scheme for deeplinking. Next you need to choose Activity where user will be redirecred from web page.
