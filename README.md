@@ -9,8 +9,7 @@ AllUnite measure the anonymous consumer in the local store using AllUnite WiFi a
 
 The purpose of this document is to describe how to integrate AllUnite SDK in an app.
 
-AllUnite SDK designed to match consumer's web profile to their physical device and to track
-consumers in the physical world.
+AllUnite SDK designed to track consumers in the physical world.
 
 ![Overal schema](https://s3-eu-west-1.amazonaws.com/allunite-main/doc/scheme_v3.2.png)
 
@@ -25,8 +24,7 @@ You can enable or disable SDK explicitly using application URI (deep link) <app_
 To make it possible you would need to use AllUniteSdk.parseIncomingIntent() method as it described in "Add code for intercepting users choise at web Terms&Conditions using deeplink" below.
 
 It can be useful if Application shows Terms & Conditions page that has "OK" and "No Thanks" options.
-In this case "No Thanks" button opens <app_schema>://allunite-sdk-mode?enable=false that disables AllUnite SDK functionality, 
-"OK" button can starts matching process directly in the browser (we need to customize it first) or using AllUniteSdk.bindDevice() method (see next paragraph).
+In this case "No Thanks" button opens <app_schema>://allunite-sdk-mode?enable=false that disables AllUnite SDK functionality.
 
 ##### 2. Start beacon tracking (**REQUIRED**)
 To start tracking you need to call AllUniteSdk.addDidFindBeaconListener() method.
