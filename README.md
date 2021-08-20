@@ -292,3 +292,6 @@ public class MyGcmListenerService extends com.google.android.gms.gcm.GcmListener
 #### 12. That's it! AllUnite is now integrated with your app.
 
 In order to ensure our library doesn't have an impact on user experience, we send events asynchronously.
+
+	
+	
